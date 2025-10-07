@@ -5,30 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PCI DSS Compliance Assistant</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Inter font for a clean, modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>PCI DSS Compliance Assistant 🤖</h1>
-            <p>Upload an Excel file with 'Observation' or 'Description' columns to get AI-powered remediation advice.</p>
-        </header>
-
-        <main>
-            <form id="upload-form">
-                <input type="file" id="file-input" accept=".xlsx, .xls" required>
-                <label for="file-input" class="file-label">
-                    <span id="file-name">📂 Choose an Excel File...</span>
-                </label>
-                <button type="submit" id="analyze-button">Analyze File</button>
-            </form>
-
-            <div id="result-container" class="hidden">
-                <h2>Analysis Report</h2>
-                <div id="spinner" class="spinner"></div>
-                <pre id="report-output"></pre>
+    <nav class="top-nav">
+        <div class="logo-area">
+            <div class="logo-img"></div>
+            <div class="logo-text-group">
+                <span class="logo-text">PCI DSS Assistant</span>
+                <span class="logo-subtext">from AI-powered Compliance</span>
             </div>
-        </main>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="#" class="nav-link">Search History</a>
+            <a href="#" class="nav-link">Downloads</a>
+            <a href="#" class="nav-link">Internal Docs</a>
+        </div>
+
+        <div class="nav-actions">
+        </div>
+    </nav>
+
+    <div class="main-content-wrapper">
+        <div class="container">
+            <header class="hero-header">
+                <h1 class="hero-headline">
+                    <span class="h1-top">Where</span>
+                    <span class="h1-work">Compliance</span> 
+                    <span class="h1-bottom">happens</span>
+                </h1>
+                <p class="hero-subtext">Upload it. Analyze it. Get remediation done.</p>
+            </header>
+    
+            <main>
+                <form id="upload-form">
+                    <input type="file" id="file-input" accept=".xlsx, .xls" required style="display: none;">
+                    
+                    <button 
+                        type="button" 
+                        id="analyze-button" 
+                        class="hero-main-button"
+                        onclick="document.getElementById('file-input').click();"
+                        >
+                        UPLOAD & ANALYZE
+                    </button>
+                </form>
+    
+                <div id="result-container" class="hidden">
+                    <div id="spinner" class="spinner"></div>
+                    <pre id="report-output"></pre> 
+                    <div id="report-actions">
+                        <button class="reopen-button" id="view-report-button" style="display:none;">
+                            View Analysis Report
+                        </button>
+                        <!-- Download button on main page -->
+                        <button class="reopen-button download-button" id="download-report-button" style="display:none;">
+                            Download Report
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
+    
+    <div id="report-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>AI Remediation Report Card 🤖</h2>
+                <!-- Download button inside the modal -->
+                <button class="modal-download-button" id="modal-download-button">
+                    Download
+                </button>
+                <button class="close-button" id="modal-close-button">&times;</button>
+            </div>
+            <pre id="modal-report-output">Report will appear here...</pre>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

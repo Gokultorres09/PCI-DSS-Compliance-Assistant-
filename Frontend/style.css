@@ -1,122 +1,425 @@
+/* Import Inter for a cleaner, modern look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+/* --- Global Reset and Base Styles --- */
+:root {
+    --color-primary: #521877;
+    /* Dark Purple */
+    --color-download: #3498db;
+    /* Blue for action */
+    --color-secondary: #000;
+    --color-background: #fff;
+    --color-text: #1d1c1d;
+    /* Near Black */
+    --color-light-gray: #e6e6e6;
+    --font-family-primary: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
+    font-family: var(--font-family-primary);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    line-height: 1.6;
+}
+
+/* --- Navigation Bar Styles (Top Bar) --- */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5rem;
+    gap: 20px;
+}
+
+/* Logo Area: Align image and text vertically */
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.logo-img {
+    height: 55px;
+    /* Placeholder for a security icon SVG */
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23521877' d='M12 2L4 6v6c0 5.55 3.84 10.74 9 12a22.95 22.95 0 0 0 9-12V6l-8-4zm0 18.96c-4.14-1.28-7.14-5.32-7-9.96v-4.43l7-3.5 7 3.5v4.43c.14 4.64-2.86 8.68-7 9.96zM11 15h2v2h-2zm0-8h2v6h-2z'/%3E%3C/svg%3E");
+}
+
+/* Container for text elements to stack them */
+.logo-text-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1;
+}
+
+.logo-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 2px;
+}
+
+.logo-subtext {
+    font-size: 0.7rem;
+    color: gray;
+    font-weight: 400;
+}
+
+/* Navigation Menu: Pushed left, larger links */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-grow: 1;
+    padding-left: 40px;
+    justify-content: flex-start;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--color-primary);
+}
+
+
+.nav-actions {
+    flex-shrink: 0;
+}
+
+/* --- Main Content Layout --- */
+.main-content-wrapper {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
+    padding: 6rem 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Padlock/Lock SVG as a subtle, large watermark background */
+.main-content-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 70%;
+    width: 400px;
+    height: 400px;
+    opacity: 0.05;
+    transform: translate(-50%, -50%) rotate(15deg);
+    z-index: 0;
+
+    /* Base64 encoded SVG for a simple, solid padlock icon */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23521877' d='M12 17a2 2 0 0 1-2-2v-2a2 2 0 0 1 4 0v2a2 2 0 0 1-2 2z'/%3E%3Cpath fill='%23521877' d='M18 10h-1V7a5 5 0 0 0-10 0v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-9-3a3 3 0 0 1 6 0v3h-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .container {
-    background: #fff;
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     width: 100%;
     max-width: 800px;
-}
-
-header {
     text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 20px;
+    position: relative;
+    z-index: 10;
 }
 
-h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
+/* --- Hero Header (Headline Area) --- */
+.hero-header {
+    margin-bottom: 3rem;
 }
 
-p {
-    color: #7f8c8d;
+.hero-headline {
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1rem;
 }
 
+.h1-work {
+    color: var(--color-primary);
+}
+
+.hero-subtext {
+    font-size: 1.25rem;
+    color: #4a4a4a;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- Main Form and Button --- */
 #upload-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
-input[type="file"] {
-    display: none; /* Hide the default input */
-}
-
-.file-label {
-    border: 2px dashed #bdc3c7;
-    border-radius: 8px;
-    padding: 25px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.file-label:hover {
-    border-color: #3498db;
-    background-color: #f8f9fa;
-}
-
-#file-name {
-    color: #555;
-}
-
-button {
-    background-color: #3498db;
-    color: white;
+.hero-main-button {
+    background-color: var(--color-primary);
+    color: var(--color-background);
     border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
+    padding: 1.25rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
     cursor: pointer;
+    border-radius: 8px;
+    width: 350px;
     transition: background-color 0.2s;
+    box-shadow: 0 4px 15px rgba(82, 24, 119, 0.4);
 }
 
-button:hover {
-    background-color: #2980b9;
+.hero-main-button:hover:not(:disabled) {
+    background-color: #7b4c9b;
 }
 
-button:disabled {
+.hero-main-button:disabled {
     background-color: #95a5a6;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
+/* --- Result Container --- */
 #result-container {
-    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4rem;
 }
 
 #result-container.hidden {
     display: none;
 }
 
-pre {
-    background-color: #ecf0f1;
-    color: #2c3e50;
-    padding: 20px;
-    border-radius: 8px;
-    white-space: pre-wrap; /* Allows text to wrap */
-    word-wrap: break-word;
-    font-size: 14px;
-    line-height: 1.6;
-    max-height: 600px;
-    overflow-y: auto;
+#report-output {
+    display: none;
 }
 
-/* Spinner */
+/* --- Action Buttons (View/Download) --- */
+#result-container .reopen-button {
+    margin: 10px;
+}
+
+.reopen-button {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    padding: 12px 25px;
+    margin-top: 20px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reopen-button:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+/* Style for the main page download button */
+.reopen-button.download-button {
+    border-color: var(--color-download);
+    color: var(--color-download);
+}
+
+.reopen-button.download-button:hover {
+    background-color: var(--color-download);
+    color: white;
+}
+
+
+/* --- Spinner --- */
 .spinner {
     border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
+    border-top: 5px solid var(--color-primary);
     border-radius: 50%;
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
     margin: 20px auto;
+    display: none;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- MODAL/POP-UP STYLES --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-content {
+    background: var(--color-background);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 900px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
+    margin: 20px 0;
+}
+
+.modal-header {
+    /* Use Grid for Title | Download Button | Close Button layout */
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 2px solid var(--color-light-gray);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    text-align: left;
+}
+
+/* Style for the Download button inside the modal header */
+.modal-download-button {
+    background-color: var(--color-download);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.modal-download-button:hover {
+    background-color: #2980b9;
+}
+
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--color-text);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+    padding: 0 5px;
+    /* Add padding for easier touch target */
+}
+
+.close-button:hover {
+    color: #ff4500;
+}
+
+#modal-report-output {
+    background-color: #f7ffef;
+    color: #2c3e50;
+    padding: 20px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 14px;
+    line-height: 1.6;
+    max-height: 70vh;
+    overflow-y: auto;
+    text-align: left;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 900px) {
+    .top-nav {
+        padding: 0.75rem 1rem;
+    }
+
+    .nav-menu {
+        display: none;
+    }
+
+    .hero-headline {
+        font-size: 3rem;
+    }
+
+    .hero-subtext {
+        font-size: 1rem;
+    }
+
+    .hero-main-button {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    /* Hide the background element on small screens to prevent crowding */
+    .main-content-wrapper::before {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .modal-header {
+        /* On very small screens, stack the title and buttons */
+        grid-template-columns: 1fr auto;
+    }
+
+    .modal-header h2 {
+        grid-column: 1 / 3;
+        /* Title spans both columns */
+        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    .modal-download-button {
+        grid-column: 1 / 2;
+        /* Download button moves to first column, next row */
+    }
+
+    .close-button {
+        grid-column: 2 / 3;
+        /* Close button stays in second column, next row */
+    }
 }
