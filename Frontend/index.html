@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PCI DSS Compliance Assistant</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Inter font for a clean, modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="top-nav">
         <div class="logo-area">
-            <img src="pcidss.png" alt="PCI DSS Assistant Logo" class="logo-img">
-            
+            <div class="logo-img"></div>
             <div class="logo-text-group">
                 <span class="logo-text">PCI DSS Assistant</span>
                 <span class="logo-subtext">from AI-powered Compliance</span>
@@ -25,7 +25,7 @@
         </div>
 
         <div class="nav-actions">
-            </div>
+        </div>
     </nav>
 
     <div class="main-content-wrapper">
@@ -48,7 +48,7 @@
                         id="analyze-button" 
                         class="hero-main-button"
                         onclick="document.getElementById('file-input').click();"
-                    >
+                        >
                         UPLOAD & ANALYZE
                     </button>
                 </form>
@@ -56,9 +56,15 @@
                 <div id="result-container" class="hidden">
                     <div id="spinner" class="spinner"></div>
                     <pre id="report-output"></pre> 
-                    <button class="reopen-button" id="view-report-button" style="display:none;">
-                        View Analysis Report
-                    </button>
+                    <div id="report-actions">
+                        <button class="reopen-button" id="view-report-button" style="display:none;">
+                            View Analysis Report
+                        </button>
+                        <!-- Download button on main page -->
+                        <button class="reopen-button download-button" id="download-report-button" style="display:none;">
+                            Download Report
+                        </button>
+                    </div>
                 </div>
             </main>
         </div>
@@ -68,6 +74,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>AI Remediation Report Card 🤖</h2>
+                <!-- Download button inside the modal -->
+                <button class="modal-download-button" id="modal-download-button">
+                    Download
+                </button>
                 <button class="close-button" id="modal-close-button">&times;</button>
             </div>
             <pre id="modal-report-output">Report will appear here...</pre>
