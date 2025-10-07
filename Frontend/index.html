@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCI DSS Compliance Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PCI DSS Compliance Assistant 🤖</h1>
+            <p>Upload an Excel file with 'Observation' or 'Description' columns to get AI-powered remediation advice.</p>
+        </header>
+
+        <main>
+            <form id="upload-form">
+                <input type="file" id="file-input" accept=".xlsx, .xls" required>
+                <label for="file-input" class="file-label">
+                    <span id="file-name">📂 Choose an Excel File...</span>
+                </label>
+                <button type="submit" id="analyze-button">Analyze File</button>
+            </form>
+
+            <div id="result-container" class="hidden">
+                <h2>Analysis Report</h2>
+                <div id="spinner" class="spinner"></div>
+                <pre id="report-output"></pre>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
