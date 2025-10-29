@@ -10,12 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("report-modal");
     const modalCloseButton = document.getElementById("modal-close-button");
     const modalReportOutput = document.getElementById("modal-report-output");
-    // No reportStorage needed for HTML, we fetch it on demand
+    // *** NEW: Download History Modal Elements ***
+    const downloadsNavLink = document.getElementById("downloads-nav-link");
+    const downloadHistoryModal = document.getElementById("download-history-modal");
+    const downloadHistoryCloseButton = document.getElementById("download-history-close-button");
+    const downloadHistoryOutput = document.getElementById("download-history-output");
+
 
     // --- Check if elements were found ---
-     if (!uploadForm || !fileInput || !analyzeButton || !resultContainer || !spinner || !viewReportButton || !downloadReportButton || !modal || !modalCloseButton || !modalReportOutput) {
-         console.error("Initialization Error: One or more essential DOM elements not found. Check IDs in index.html and script.js.");
-         // Display error prominently if elements are missing
+     if (!uploadForm || !fileInput || !analyzeButton || !resultContainer || !spinner || !viewReportButton || !downloadReportButton || !modal || !modalCloseButton || !modalReportOutput || !downloadsNavLink || !downloadHistoryModal || !downloadHistoryCloseButton || !downloadHistoryOutput) { // Added checks for new elements
+         console.error("Initialization Error: One or more essential DOM elements not found.");
          const body = document.querySelector('body');
          if(body) {
              const errorDiv = document.createElement('div');
@@ -27,148 +31,109 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("All essential DOM elements found.");
      }
 
-    // --- API URLs for the 3 endpoints ---
+    // --- API URLs ---
     const ANALYZE_API_URL = "http://localhost:8000/analyze/";
     const FORMAT_HTML_API_URL = "http://localhost:8000/format/html/";
     const FORMAT_EXCEL_API_URL = "http://localhost:8000/format/excel/";
 
-    // --- State Variable ---
-    let analysisResults = null; // Store the JSON data
-    let originalFilename = "";   // Store the original filename
+    // --- State Variables ---
+    let analysisResults = null;
+    let originalFilename = "";
+    const DOWNLOAD_HISTORY_KEY = 'pciReportDownloadHistory'; // Key for localStorage
+    const MAX_HISTORY_ITEMS = 10; // Max downloads to store
 
     // --- Event Listeners ---
-    // Prevent the form itself from causing a page reload if accidentally submitted
-    uploadForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        console.log("Form submit intercepted and prevented.");
-    });
-
-    // Attach listener to the main UPLOAD button
-    analyzeButton.addEventListener("click", () => {
-        console.log("Analyze button clicked."); // Log for debugging
-        fileInput.click(); // Programmatically click the hidden file input
-    });
-
-    // Attach listener to the hidden file input to trigger analysis when a file is chosen
+    uploadForm.addEventListener("submit", (e) => e.preventDefault());
+    analyzeButton.addEventListener("click", () => fileInput.click());
     fileInput.addEventListener("change", handleFileAnalysis);
-
-    // Attach listeners to the result buttons (View/Download)
     viewReportButton.addEventListener("click", handleViewHtmlReport);
     downloadReportButton.addEventListener("click", handleExcelDownload);
-
-    // Attach listeners for modal closing
     modalCloseButton.addEventListener("click", closeModal);
-    modal.addEventListener("click", (e) => {
-        // Close modal if user clicks on the background overlay
-        if (e.target === modal) {
-            closeModal();
-        }
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+    // *** NEW: Download History Listeners ***
+    downloadsNavLink.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevent link default action
+        displayDownloadHistory();
     });
+    downloadHistoryCloseButton.addEventListener("click", closeDownloadHistoryModal);
+    downloadHistoryModal.addEventListener("click", (e) => { if (e.target === downloadHistoryModal) closeDownloadHistoryModal(); });
 
     // --- Core Functions ---
 
-    /** Step 1: Analyze file, get JSON data */
-    async function handleFileAnalysis() {
-        if (!fileInput || fileInput.files.length === 0) {
-             console.log("handleFileAnalysis called but no file selected.");
-             return;
-        }
-
+    // (handleFileAnalysis remains the same as the correct analyze-once version)
+     async function handleFileAnalysis() {
+        if (!fileInput || fileInput.files.length === 0) return;
         console.log("handleFileAnalysis triggered (Analyze-Once Workflow).");
         setLoadingState(true);
-        analysisResults = null; // Clear previous results
-        originalFilename = fileInput.files[0].name; // Store filename
-
+        analysisResults = null;
+        originalFilename = fileInput.files[0].name;
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
-
         console.log("Requesting URL:", ANALYZE_API_URL);
-
         try {
-            // Call the /analyze endpoint (expects JSON response)
             const response = await fetch(ANALYZE_API_URL, { method: "POST", body: formData });
-
             console.log("Analysis Response status:", response.status);
             const contentType = response.headers.get('content-type');
             console.log("Analysis Response content type:", contentType);
-
             if (!response.ok) {
-                 // Robust error handling (read as text first)
                 let errorMsg = `Analysis failed (HTTP ${response.status})`;
                 try {
                     const errorText = await response.text();
                     if (contentType && contentType.includes('application/json')) {
                         const errorData = JSON.parse(errorText);
                         errorMsg = errorData.detail || errorText;
-                    } else { // Handle non-JSON error responses (like HTML error pages)
+                    } else {
                         const match = errorText.match(/<pre>(.*?)<\/pre>/i);
                         errorMsg = match ? match[1].trim() : errorText.substring(0, 500);
                     }
                 } catch (e) { console.error("Could not read analysis error response body:", e); }
                 throw new Error(errorMsg);
             }
-
-            // --- Expect JSON data ---
             if (!contentType || !contentType.includes('application/json')) {
                 const responseText = await response.text();
-                throw new Error(`Expected JSON from /analyze but received ${contentType}. Response: ${responseText.substring(0,100)}...`);
+                throw new Error(`Expected JSON but received ${contentType}. Resp: ${responseText.substring(0,100)}...`);
             }
-
-            analysisResults = await response.json(); // Store the structured JSON data
+            analysisResults = await response.json();
             console.log("Received analysis results (JSON):", analysisResults);
-
-            // Check if results are empty
             if (!analysisResults || analysisResults.length === 0) {
                  console.warn("Analysis successful but returned no findings.");
-                 // Optionally display a message in the modal area later
             }
-
-            setLoadingState(false, true); // Analysis complete, show buttons
-
+            setLoadingState(false, true);
         } catch (error) {
             console.error("Error during analysis:", error);
-            // Display error in modal content area for visibility
-            modalReportOutput.innerHTML = `<h3>Analysis Error</h3><p>Could not process the file.</p><p><strong>Details:</strong> ${error.message}</p><p>Please check console & backend logs.</p>`;
-            openModal(modalReportOutput.innerHTML); // Open modal to show the error
-            analysisResults = null; // Clear results on error
-            setLoadingState(false, true); // Still show buttons, user might want to try download if analysis partially worked before
+            modalReportOutput.innerHTML = `<h3>Analysis Error</h3><p>${error.message}</p><p>Check console & backend logs.</p>`;
+            openModal(modalReportOutput.innerHTML);
+            analysisResults = null;
+            setLoadingState(false, true); // Show buttons even on error
         } finally {
-            if (fileInput) fileInput.value = ""; // Reset file input
+            if (fileInput) fileInput.value = "";
         }
     }
 
-    /** Step 2a: Request HTML formatting and open modal */
+
+    // (handleViewHtmlReport remains the same as the correct analyze-once version)
     async function handleViewHtmlReport() {
-        if (!analysisResults) { // Check if results exist
-            alert("No analysis data available to display. Please analyze a file first.");
+        if (!analysisResults) {
+            alert("No analysis data available. Please analyze a file first.");
             return;
         }
         if (analysisResults.length === 0) {
-            alert("Analysis completed, but no findings were generated from the file.");
-            // Open modal with a "No Findings" message
-             openModal("<h1>PCI DSS Gap Analysis Report</h1><p><strong>Source File:</strong> "+originalFilename+"</p><hr/><p>No findings were generated from the provided file.</p>");
+            openModal("<h1>Report</h1><p><strong>Source:</strong> "+originalFilename+"</p><hr/><p>No findings generated.</p>");
             return;
         }
-
         viewReportButton.textContent = "Loading View...";
         viewReportButton.disabled = true;
-
         try {
             console.log("Requesting HTML format from:", FORMAT_HTML_API_URL);
-            // Call the /format/html endpoint, sending the stored JSON data
             const response = await fetch(FORMAT_HTML_API_URL, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                // Send the stored JSON data and original filename
+                method: "POST", headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ report_data: analysisResults, filename: originalFilename })
             });
-
             console.log("HTML Format Response status:", response.status);
             const contentType = response.headers.get('content-type');
             console.log("HTML Format Response content type:", contentType);
-
             if (!response.ok) {
-                 // Robust error handling
                 let errorMsg = `HTML formatting failed (HTTP ${response.status})`;
                  try {
                      const errorText = await response.text();
@@ -182,16 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
                  } catch (e) { /* ignore */ }
                  throw new Error(errorMsg);
             }
-
             if (!contentType || !contentType.includes('text/html')) {
                  const responseText = await response.text();
-                 throw new Error(`Expected HTML from /format/html but received ${contentType}. Resp: ${responseText.substring(0,100)}...`);
+                 throw new Error(`Expected HTML but received ${contentType}. Resp: ${responseText.substring(0,100)}...`);
             }
-
             const htmlContent = await response.text();
             console.log("Received formatted HTML (first 100 chars):", htmlContent.substring(0, 100));
-            openModal(htmlContent); // Pass HTML directly to modal
-
+            openModal(htmlContent);
         } catch (error) {
             console.error("Error fetching HTML report:", error);
             alert(`Could not display report: ${error.message}`);
@@ -201,10 +163,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /** Step 2b: Request Excel formatting and download */
+
+    // *** MODIFIED handleExcelDownload to save history ***
     async function handleExcelDownload() {
-        if (!analysisResults) { // Check if results exist
-            alert("No analysis data available to download. Please analyze a file first.");
+        if (!analysisResults) {
+            alert("No analysis data available to download.");
             return;
         }
          if (analysisResults.length === 0) {
@@ -217,17 +180,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             console.log("Requesting Excel format from:", FORMAT_EXCEL_API_URL);
-             // Call the /format/excel endpoint, sending the stored JSON data
             const response = await fetch(FORMAT_EXCEL_API_URL, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ report_data: analysisResults, filename: originalFilename }) // Send stored data
+                method: "POST", headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ report_data: analysisResults, filename: originalFilename })
             });
-
             console.log("Excel Format Response status:", response.status);
-
             if (!response.ok) {
-                 // Robust error handling
                 let errorMsg = `Excel generation failed (HTTP ${response.status})`;
                 try {
                      const errorText = await response.text();
@@ -242,28 +200,29 @@ document.addEventListener("DOMContentLoaded", () => {
                  } catch (e) { /* ignore */ }
                  throw new Error(errorMsg);
             }
-
-            // Check content type for Excel
             const contentType = response.headers.get('content-type');
              console.log("Excel Format Response content type:", contentType);
-             // More specific check for Excel MIME types
              if (!contentType || !(contentType.includes('spreadsheetml') || contentType.includes('ms-excel'))) {
-                  const responseText = await response.text(); // Try reading as text to see error
-                  throw new Error(`Expected Excel file but received ${contentType}. Response: ${responseText.substring(0,100)}...`);
+                  const responseText = await response.text();
+                  throw new Error(`Expected Excel file but received ${contentType}. Resp: ${responseText.substring(0,100)}...`);
              }
-
 
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             const cleanFilename = originalFilename.replace(/\.(xlsx|xls)$/, '');
+            // *** Construct the download filename ***
+            const downloadFilename = `PCI_DSS_Action_Report_${cleanFilename}.xlsx`;
             a.href = url;
-            a.download = `PCI_DSS_Action_Report_${cleanFilename}.xlsx`;
+            a.download = downloadFilename; // Use the constructed filename
             document.body.appendChild(a);
             a.click();
-            a.remove();
+            document.body.removeChild(a); // Clean up the link
             window.URL.revokeObjectURL(url);
-            console.log("Excel download initiated.");
+            console.log("Excel download initiated for:", downloadFilename);
+
+            // *** SAVE TO LOCALSTORAGE (only on success) ***
+            saveDownloadToHistory(downloadFilename);
 
         } catch (error) {
             console.error("Error downloading Excel:", error);
@@ -274,9 +233,59 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /** Manages the UI loading and result states */
-    function setLoadingState(isLoading, showButtons = false) {
-        // Add checks for element existence
+    // *** NEW: Function to save download info ***
+    function saveDownloadToHistory(filename) {
+        try {
+            const history = JSON.parse(localStorage.getItem(DOWNLOAD_HISTORY_KEY) || '[]');
+            const newEntry = {
+                filename: filename,
+                timestamp: new Date().toISOString() // Store as ISO string
+            };
+            // Add to the beginning of the array
+            history.unshift(newEntry);
+            // Limit history size
+            const trimmedHistory = history.slice(0, MAX_HISTORY_ITEMS);
+            localStorage.setItem(DOWNLOAD_HISTORY_KEY, JSON.stringify(trimmedHistory));
+            console.log("Saved download to history:", newEntry.filename);
+        } catch (error) {
+            console.error("Error saving download history to localStorage:", error);
+        }
+    }
+
+    // *** NEW: Function to display download history ***
+    function displayDownloadHistory() {
+        try {
+            const history = JSON.parse(localStorage.getItem(DOWNLOAD_HISTORY_KEY) || '[]');
+            if (history.length === 0) {
+                downloadHistoryOutput.innerHTML = "<p>No downloads recorded yet.</p>";
+            } else {
+                let historyHtml = "<ul>";
+                history.forEach(entry => {
+                    const date = new Date(entry.timestamp);
+                    const formattedDate = date.toLocaleString(); // Format date nicely
+                    // Escape filename to prevent potential XSS if filename contains HTML
+                    const safeFilename = entry.filename.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    historyHtml += `<li><strong>${safeFilename}</strong><br/><small>${formattedDate}</small></li>`;
+                });
+                historyHtml += "</ul>";
+                downloadHistoryOutput.innerHTML = historyHtml;
+            }
+            downloadHistoryModal.style.display = 'flex'; // Show the modal
+        } catch (error) {
+            console.error("Error reading or displaying download history:", error);
+            downloadHistoryOutput.innerHTML = "<p>Error loading download history.</p>";
+            downloadHistoryModal.style.display = 'flex'; // Show modal even on error
+        }
+    }
+
+    // *** NEW: Function to close the history modal ***
+    function closeDownloadHistoryModal() {
+        downloadHistoryModal.style.display = 'none';
+    }
+
+
+    // (setLoadingState, openModal, closeModal remain the same)
+     function setLoadingState(isLoading, showButtons = false) {
         if (spinner) spinner.style.display = isLoading ? "block" : "none";
         if (analyzeButton) {
             analyzeButton.disabled = isLoading;
@@ -286,24 +295,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (viewReportButton) viewReportButton.style.display = showButtons ? "inline-block" : "none";
         if (downloadReportButton) downloadReportButton.style.display = showButtons ? "inline-block" : "none";
     }
-
-    /** Opens the report modal WITH the provided HTML */
-    function openModal(htmlContent) {
-        // Check elements before using
+     function openModal(htmlContent) {
         if (modalReportOutput) {
             modalReportOutput.innerHTML = htmlContent;
-        } else {
-             console.error("Cannot open modal: modalReportOutput element not found.");
-             return;
-        }
-        if (modal) {
-            modal.style.display = "flex";
-        } else {
-            console.error("Cannot open modal: modal element not found.");
-        }
+        } else { console.error("modalReportOutput not found"); return; }
+        if (modal) { modal.style.display = "flex"; }
+        else { console.error("modal element not found"); }
     }
-
-    function closeModal() {
+     function closeModal() {
         if (modal) modal.style.display = "none";
     }
 

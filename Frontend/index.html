@@ -19,7 +19,7 @@
         </div>
         <div class="nav-menu">
             <a href="#" class="nav-link">Search History</a>
-            <a href="#" class="nav-link">Downloads</a>
+            <a href="#" id="downloads-nav-link" class="nav-link">Downloads</a>
             <a href="#" class="nav-link">Internal Docs</a>
         </div>
         <div class="nav-actions"></div>
@@ -70,6 +70,17 @@
         </div>
     </div>
 
+    <div id="download-history-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Download History</h2>
+                <button class="close-button" id="download-history-close-button">&times;</button>
+            </div>
+            <div id="download-history-output">
+                <p>No downloads recorded yet.</p>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

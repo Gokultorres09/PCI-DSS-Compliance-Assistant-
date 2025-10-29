@@ -318,3 +318,30 @@ body {
         display: none;
     }
 }
+/* --- Add styles for Download History Modal --- */
+#download-history-output ul {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+    margin: 0;
+}
+
+#download-history-output li {
+    border-bottom: 1px solid var(--color-light-gray);
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+#download-history-output li:last-child {
+    border-bottom: none; /* No border on the last item */
+    margin-bottom: 0;
+}
+
+#download-history-output li strong {
+    display: block; /* Filename on its own line */
+    margin-bottom: 4px;
+    word-break: break-all; /* Prevent long filenames from overflowing */
+}
+
+#download-history-output li small {
+    color: #666; /* Lighter color for timestamp */
+}
