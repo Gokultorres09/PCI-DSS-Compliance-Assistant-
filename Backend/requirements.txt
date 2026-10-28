@@ -1,8 +1,10 @@
 fastapi
 uvicorn
+gunicorn
 python-multipart
 pandas
 openpyxl
 langchain
 langchain-google-genai
-
+chromadb
+sentence-transformers

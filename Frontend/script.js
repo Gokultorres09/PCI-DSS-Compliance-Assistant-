@@ -32,9 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
      }
 
     // --- API URLs ---
-    const ANALYZE_API_URL = "http://localhost:8000/analyze/";
-    const FORMAT_HTML_API_URL = "http://localhost:8000/format/html/";
-    const FORMAT_EXCEL_API_URL = "http://localhost:8000/format/excel/";
+    const API_BASE_URL = "https://cargo-pectin-drench.ngrok-free.dev";
+
+    const ANALYZE_API_URL = `${API_BASE_URL}/analyze/`;
+    const FORMAT_HTML_API_URL = `${API_BASE_URL}/format/html/`;
+    const FORMAT_EXCEL_API_URL = `${API_BASE_URL}/format/excel/`;
 
     // --- State Variables ---
     let analysisResults = null;
